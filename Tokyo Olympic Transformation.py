@@ -54,20 +54,8 @@ entriesgender.printSchema()
 
 # COMMAND ----------
 
-
-
-# COMMAND ----------
-
 # MAGIC %fs
 # MAGIC ls "/mnt/tokyoolymic"
-
-# COMMAND ----------
-
-
-
-# COMMAND ----------
-
-
 
 # COMMAND ----------
 
@@ -101,6 +89,29 @@ entriesgender.printSchema()
 
 #Find the top countries with the highest number of goal medals
 top_gold_medal_countries = medals.orderBy("Gold", ascending=False).select("Team_Country","Gold").show()
+
+# COMMAND ----------
+
+# Calculate the average number of entries by gender for each discipline
+average_entries_by_gender = entriesgender.withColumn(
+    'Avg_Female', entriesgender['Female'] / entriesgender['Total']
+).withColumn(
+    'Avg_Male', entriesgender['Male'] / entriesgender['Total']
+)
+average_entries_by_gender.show()
+
+# COMMAND ----------
+
+athletes.repartition(1).write.mode("overwrite").option("header",'true').csv("/mnt/tokyoolymic/transformed-data/athletes")
+
+
+# COMMAND ----------
+
+coaches.repartition(1).write.mode("overwrite").option("header","true").csv("/mnt/tokyoolymic/transformed-data/coaches")
+entriesgender.repartition(1).write.mode("overwrite").option("header","true").csv("/mnt/tokyoolymic/transformed-data/entriesgender")
+medals.repartition(1).write.mode("overwrite").option("header","true").csv("/mnt/tokyoolymic/transformed-data/medals")
+teams.repartition(1).write.mode("overwrite").option("header","true").csv("/mnt/tokyoolymic/transformed-data/teams")
+     
 
 # COMMAND ----------
 
